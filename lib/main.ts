@@ -30,3 +30,7 @@ export function HandleNone(index?: number) {
     return propertyDesciptor
   }
 }
+
+export function tMap<T, V>((_:T)=>V, ): V{
+
+}
