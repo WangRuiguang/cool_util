@@ -1,0 +1,14 @@
+{
+  "name": "wrg_util",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": {
+    "name": "wangruiguang",
+    "email": "wrging@qq.com"
+  },
+  "license": "ISC"
+}
