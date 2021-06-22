@@ -1,11 +1,6 @@
-import { pipe } from 'fp-ts/function'
-function transformer<T0, T1>(step:(v:T0)=>T1){
-  return (result: (list:T1[], v0:T1)=>T1[])=>{
-    return (v: T0[]): T1[]=> {
-      return reduce((p, c)=>result(p, step(c)), [] as T1[], v)
-    }
-  }
-}
+import { flow, pipe } from 'fp-ts/function'
+import { type } from 'ramda'
+
 
 
 function reduce<T0, T1>(fn: (p: T1[], c: T0)=>T1[], acc: T1[], list: T0[]){
@@ -17,13 +12,10 @@ function add1(v: number){
 function append<T>(list: T[], v: T){
   return [...list, v]
 }
-console.log(
-  transformer(add1)(append)([0,1,2])
-)
 
-function tmap<T>(step: (v: T)=>T){
-  return function(join: Join<T>){
-    return function(acc: T[], elem: T){
+function tmap<T, U>(step: (v: T)=>U){
+  return function(join: Join<U>){
+    return function(acc: U[], elem: T){
       return join(acc, step(elem))
     }
   }
@@ -45,6 +37,30 @@ function isEven(v: number){
 const f = tfilter(isEven)
 console.log([1,2,3].reduce((acc, elem)=>f(tmap(add1)(append))(acc, elem), [] as number[]))
 
-interface Join<T>{
-  (acc: T[], elem: T): T[]
+interface Join<T, U>{
+  (acc: U[], elem: T): U[]
 }
+interface Step<T0, T1>{
+  (join: (step: (v: T0)=> T1) => Join<T1>): (acc: T1[], elem: T0)=> T1[]
+}
+interface Step2<T, U>{
+  (step: (v: T) => U): (join: Join<U>) => (acc: U[], elem: T) => U[]
+}
+type Step1 = <T, U>(join: Join<T, U>) => (acc: U[], elem: T) => U[]
+
+
+
+
+// function transducer<T0, T1>(v0: T0[], V1: T1[], join: Join<T1>, step: Step2<T0, T1>){
+//   return (step1: (v: T0)=> T1)=>reduce(step(step1)(join), V1, v0)
+  
+// }
+
+function transducer<T0, T1>(v0: T0[], V1: T1[], join: Join<T0, T1>){
+  return (fn: Step1) =>reduce(fn(join), V1, v0)
+}
+
+console.log(
+  
+  transducer([0,1,2,3], [] as number[], append)(tmap(add1))
+  )
